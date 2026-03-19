@@ -85,12 +85,14 @@ const LinkRatingStep = ({
     links,
     currentProgress,
     showNodeClarificationStep,
+    showNodeRankingStep = true,
     displayRequirementError,
   } = data;
 
   const linkProgress = getLinkProgress({
     currentProgress,
     showNodeClarificationStep,
+    showNodeRankingStep,
   });
 
   const topRef = useRef<HTMLDivElement>(null);

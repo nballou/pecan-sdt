@@ -47,6 +47,17 @@
         }
       },
       "component": "network.role-customization"
+    },
+    "survey": {
+      "displayName": "Survey",
+      "type": "component",
+      "repeatable": false,
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "network.survey-config"
     }
   }
 }

@@ -1,0 +1,43 @@
+{
+  "collectionName": "components_network_survey_questions",
+  "info": {
+    "displayName": "Survey Question",
+    "icon": "question",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "questionId": {
+      "type": "string",
+      "required": true
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "fieldType": {
+      "type": "enumeration",
+      "enum": ["text", "number", "select"],
+      "required": true
+    },
+    "placeholder": {
+      "type": "string"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "options": {
+      "type": "text"
+    },
+    "min": {
+      "type": "integer"
+    },
+    "max": {
+      "type": "integer"
+    },
+    "helpText": {
+      "type": "string"
+    }
+  }
+}

@@ -47,7 +47,7 @@ const LinkSlider = memo(({
                             classNames={{
                                 base: "gap-0",
                                 label: "w-full py-1",
-                                filler: value > 50 ? "bg-gradient-to-r from-gray-200 to-danger-500" : "bg-gradient-to-r from-success-500 to-gray-200",
+                                filler: value > 50 ? "bg-gradient-to-r from-gray-200 to-success-500" : "bg-gradient-to-r from-danger-500 to-gray-200",
                                 thumb: thumbBgClass,
                                 startContent: "text-sm sm:text-md",
                                 endContent: "text-sm sm:text-md",

@@ -182,6 +182,7 @@ export function reducer(state, action) {
       const {
         currentProgress,
         showNodeClarificationStep,
+        showNodeRankingStep = true,
         nodeCount } = state
       const completedSteps = updateCompletedSteps({
         nodes: state.nodes,
@@ -191,6 +192,7 @@ export function reducer(state, action) {
         responseDirection: state.responseDirection,
         responsesRequired: state.responsesRequired,
         showNodeClarificationStep: state.showNodeClarificationStep,
+        showNodeRankingStep: state.showNodeRankingStep,
         currentProgress,
         errorMessages: action.errorMessages
       })
@@ -198,8 +200,8 @@ export function reducer(state, action) {
 
         const newProgress = state.currentProgress + 1
         let highlightNode = []
-        if (isLinkRankingStep({currentProgress: newProgress, nodeCount: state.nodeCount, showNodeClarificationStep})) {
-          highlightNode = [state.nodes.filter(d => d.chosen)[getLinkProgress({currentProgress: newProgress, showNodeClarificationStep})].id]
+        if (isLinkRankingStep({currentProgress: newProgress, nodeCount: state.nodeCount, showNodeClarificationStep, showNodeRankingStep})) {
+          highlightNode = [state.nodes.filter(d => d.chosen)[getLinkProgress({currentProgress: newProgress, showNodeClarificationStep, showNodeRankingStep})].id]
         }
         const newState = {
           ...state,
@@ -238,9 +240,10 @@ export function reducer(state, action) {
     case 'progress_decrease': {
       const newProgress = state.currentProgress - 1
       const showNodeClarificationStep = state.showNodeClarificationStep
+      const showNodeRankingStep = state.showNodeRankingStep ?? true
       let highlightNode = []
-      if (isLinkRankingStep({currentProgress: newProgress, nodeCount: state.nodeCount, showNodeClarificationStep})) {
-        highlightNode = [state.nodes.filter(d => d.chosen)[getLinkProgress({currentProgress: newProgress, showNodeClarificationStep})].id]
+      if (isLinkRankingStep({currentProgress: newProgress, nodeCount: state.nodeCount, showNodeClarificationStep, showNodeRankingStep})) {
+        highlightNode = [state.nodes.filter(d => d.chosen)[getLinkProgress({currentProgress: newProgress, showNodeClarificationStep, showNodeRankingStep})].id]
       }
       const newState = {
         ...state,
@@ -270,6 +273,15 @@ export function reducer(state, action) {
       }
       saveSession(newState)
       return newState
+    }
+    case 'set_survey_responses': {
+      const newState = {
+        ...state,
+        surveyResponses: action.responses,
+        surveyCompleted: true,
+      };
+      saveSession(newState);
+      return newState;
     }
   }
   throw Error('Unknown action: ' + action.type);

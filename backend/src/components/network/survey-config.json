@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_network_survey_configs",
+  "info": {
+    "displayName": "Survey Config",
+    "icon": "clipboard",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "show": {
+      "type": "boolean",
+      "default": false
+    },
+    "header": {
+      "type": "string"
+    },
+    "intro": {
+      "type": "richtext"
+    },
+    "buttonSubmitLabel": {
+      "type": "string"
+    },
+    "questions": {
+      "displayName": "Questions",
+      "type": "component",
+      "repeatable": true,
+      "component": "network.survey-question"
+    }
+  }
+}

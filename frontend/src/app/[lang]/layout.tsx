@@ -61,9 +61,38 @@ export default async function RootLayout({
   readonly children: React.ReactNode;
   readonly params: { lang: string };
 }) {
-  const global = await getGlobal(params.lang);
-  // TODO: CREATE A CUSTOM ERROR PAGE
-  if (!global.data) return null;
+  let global;
+  try {
+    global = await getGlobal(params.lang);
+  } catch (error) {
+    // Backend not available - render minimal layout
+    return (
+      <html lang={params.lang}>
+        <body>
+          <Providers>
+            <main className="dark:bg-black dark:text-gray-100">
+              {children}
+            </main>
+          </Providers>
+        </body>
+      </html>
+    );
+  }
+
+  // Backend returned no data - render minimal layout
+  if (!global.data) {
+    return (
+      <html lang={params.lang}>
+        <body>
+          <Providers>
+            <main className="dark:bg-black dark:text-gray-100">
+              {children}
+            </main>
+          </Providers>
+        </body>
+      </html>
+    );
+  }
 
   const { notificationBanner, navbar, footer } = global.data.attributes;
 

@@ -83,6 +83,7 @@ export default function NetworkBuilder({
 
   const showNodeClarificationStep =
     (nodeClarificationStep?.show && state?.showNodeClarificationStep) || false;
+  const showNodeRankingStep = nodeRankingStep?.show !== false;
 
   return (
     <div
@@ -116,7 +117,7 @@ export default function NetworkBuilder({
           />
         )}
 
-        {isNodeRankingStep({ currentProgress, showNodeClarificationStep }) && (
+        {isNodeRankingStep({ currentProgress, showNodeClarificationStep, showNodeRankingStep }) && (
           <NodeRankingStep
             data={state}
             dispatch={dispatch}
@@ -132,6 +133,7 @@ export default function NetworkBuilder({
         {isLinkRankingIntroStep({
           currentProgress,
           showNodeClarificationStep,
+          showNodeRankingStep,
         }) && (
           <LinkRatingIntroStep
             content={linkRankingIntroStep}
@@ -143,6 +145,7 @@ export default function NetworkBuilder({
           currentProgress,
           nodeCount,
           showNodeClarificationStep,
+          showNodeRankingStep,
         }) && (
           <LinkRatingStep
             data={state}
@@ -157,6 +160,7 @@ export default function NetworkBuilder({
           currentProgress,
           nodeCount,
           showNodeClarificationStep,
+          showNodeRankingStep,
         }) && (
           <SubmitStep
             data={submitStep}

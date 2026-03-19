@@ -43,412 +43,131 @@ export default function Hero({ data }: HeroProps) {
   const demoNetwork = {
     "nodes": [
       {
-        "nodeId": "negativeEmotions",
-        "label": "Negative emotions",
-        "questionPrompt": "<strong>Negative emotions</strong> leads to ...",
-        "causePrompt": "... Negative emotions",
-        "shortLabel": null,
-        "description": null,
-        "createdAt": "2024-10-14T06:59:27.399Z",
-        "updatedAt": "2024-11-01T17:36:51.594Z",
-        "locale": "en",
-        "required": true,
-        "initialIndex": 0,
-        "id": 24,
-        "name": "Negative<br />emotions",
-        "highlight": false,
+        "nodeId": "motivation",
+        "label": "Motivation",
+        "questionPrompt": "<strong>Motivation</strong> leads to ...",
+        "causePrompt": "... Motivation",
+        "id": 1,
+        "name": "Motivation",
         "chosen": true,
-        "size": 60,
-        "nodeClarificationSelected": [
-          "anxiety"
-        ],
+        "size": 65,
         "index": 0,
-        "x": 14.009497932327069,
-        "y": -48.123168561117716,
-        "vy": -0.0314487643479727,
-        "vx": -0.020622869766588826,
-        "fx": null,
-        "fy": null
+        "x": 0,
+        "y": -80
       },
       {
-        "nodeId": "procrastination",
-        "label": "Procrastination",
-        "questionPrompt": "<strong>Procrastination</strong> leads to ...",
-        "causePrompt": "... Procrastination",
-        "shortLabel": null,
-        "description": null,
-        "createdAt": "2024-10-14T06:59:27.399Z",
-        "updatedAt": "2024-11-01T14:12:37.391Z",
-        "locale": "en",
-        "required": null,
-        "overrides": [],
-        "initialIndex": 2,
-        "id": 26,
-        "name": "Procrastination",
-        "highlight": false,
+        "nodeId": "behavior",
+        "label": "Behavior",
+        "questionPrompt": "<strong>Behavior</strong> leads to ...",
+        "causePrompt": "... Behavior",
+        "id": 2,
+        "name": "Behavior",
         "chosen": true,
         "size": 60,
-        "nodeClarificationSelected": [
-          "school"
-        ],
         "index": 1,
-        "x": -241.0108514099486,
-        "y": -63.89960896880468,
-        "vy": -0.03071697364470318,
-        "vx": -0.019135743312175768,
-        "fx": null,
-        "fy": null
+        "x": -120,
+        "y": 40
       },
       {
-        "nodeId": "workOrStudyProblems",
-        "label": "Work or Study problems",
-        "questionPrompt": "<strong>Work or study problems</strong> leads to ...",
-        "causePrompt": "... Work or study problems",
-        "shortLabel": null,
-        "description": null,
-        "createdAt": "2024-10-14T06:59:27.399Z",
-        "updatedAt": "2024-11-01T17:36:05.520Z",
-        "locale": "en",
-        "required": null,
-        "nodeClarificationHeading": null,
-        "nodeClarification": [],
-        "overrides": [],
-        "initialIndex": 7,
-        "id": 31,
-        "name": "Work or<br />Study problems",
-        "highlight": false,
+        "nodeId": "wellbeing",
+        "label": "Wellbeing",
+        "questionPrompt": "<strong>Wellbeing</strong> leads to ...",
+        "causePrompt": "... Wellbeing",
+        "id": 3,
+        "name": "Wellbeing",
         "chosen": true,
         "size": 62,
-        "nodeClarificationSelected": [],
         "index": 2,
-        "x": -259.24109752813335,
-        "y": -123.48830278850485,
-        "vy": 0.18966214730523345,
-        "vx": 0.20658268126591653,
-        "fx": null,
-        "fy": null
+        "x": 120,
+        "y": 40
       },
       {
-        "nodeId": "substanceUse",
-        "label": "Substance use",
-        "questionPrompt": "<strong>Substance use</strong> leads to ...",
-        "causePrompt": "... Substance use",
-        "shortLabel": null,
-        "description": null,
-        "createdAt": "2024-10-14T06:59:27.399Z",
-        "updatedAt": "2024-10-14T07:05:49.205Z",
-        "locale": "en",
-        "required": null,
-        "nodeClarificationHeading": null,
-        "nodeClarification": [],
-        "overrides": [],
-        "initialIndex": 16,
-        "id": 40,
-        "name": "Substance use",
-        "highlight": false,
+        "nodeId": "performance",
+        "label": "Performance",
+        "questionPrompt": "<strong>Performance</strong> leads to ...",
+        "causePrompt": "... Performance",
+        "id": 4,
+        "name": "Performance",
         "chosen": true,
-        "size": 63,
-        "nodeClarificationSelected": [],
+        "size": 58,
         "index": 3,
-        "x": 164.97871153469742,
-        "y": -148.04436089313225,
-        "vy": 0.11723623325275799,
-        "vx": 0.04289415903175953
+        "x": -80,
+        "y": 120
       },
       {
-        "nodeId": "sleepProblems",
-        "label": "Sleep problems",
-        "questionPrompt": "<strong>Sleep problems</strong> leads to ...",
-        "causePrompt": "... Sleep problems",
-        "shortLabel": null,
-        "description": null,
-        "createdAt": "2024-10-14T06:59:27.399Z",
-        "updatedAt": "2024-10-14T07:06:45.582Z",
-        "locale": "en",
-        "required": null,
-        "nodeClarificationHeading": null,
-        "nodeClarification": [],
-        "overrides": [],
-        "initialIndex": 18,
-        "id": 42,
-        "name": "Sleep problems",
-        "highlight": false,
+        "nodeId": "satisfaction",
+        "label": "Satisfaction",
+        "questionPrompt": "<strong>Satisfaction</strong> leads to ...",
+        "causePrompt": "... Satisfaction",
+        "id": 5,
+        "name": "Satisfaction",
         "chosen": true,
-        "size": 66,
-        "nodeClarificationSelected": [],
+        "size": 60,
         "index": 4,
-        "x": 144.40943285230833,
-        "y": 103.75979274756044,
-        "vy": -0.05755358573139023,
-        "vx": 0.04156730511242579,
-        "fx": null,
-        "fy": null
+        "x": 80,
+        "y": 120
       }
     ],
     "nodeCount": 5,
     "links": [
       {
-        "target": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "source": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
+        "target": { "nodeId": "behavior", "id": 2 },
+        "source": { "nodeId": "motivation", "id": 1 },
         "size": 85,
         "display": true,
         "index": 0
       },
       {
-        "target": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "source": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "size": 82,
+        "target": { "nodeId": "wellbeing", "id": 3 },
+        "source": { "nodeId": "motivation", "id": 1 },
+        "size": 70,
         "display": true,
         "index": 1
       },
       {
-        "target": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "source": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "size": 50,
+        "target": { "nodeId": "performance", "id": 4 },
+        "source": { "nodeId": "behavior", "id": 2 },
+        "size": 80,
         "display": true,
         "index": 2
       },
       {
-        "target": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "source": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "size": 50,
+        "target": { "nodeId": "satisfaction", "id": 5 },
+        "source": { "nodeId": "wellbeing", "id": 3 },
+        "size": 75,
         "display": true,
         "index": 3
       },
       {
-        "target": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "source": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "size": 88,
+        "target": { "nodeId": "satisfaction", "id": 5 },
+        "source": { "nodeId": "performance", "id": 4 },
+        "size": 65,
         "display": true,
         "index": 4
       },
       {
-        "target": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "source": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "size": 7,
+        "target": { "nodeId": "motivation", "id": 1 },
+        "source": { "nodeId": "satisfaction", "id": 5 },
+        "size": 72,
         "display": true,
         "index": 5
       },
       {
-        "target": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "source": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "size": 7,
+        "target": { "nodeId": "wellbeing", "id": 3 },
+        "source": { "nodeId": "satisfaction", "id": 5 },
+        "size": 68,
         "display": true,
         "index": 6
       },
       {
-        "target": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "source": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "size": 7,
+        "target": { "nodeId": "motivation", "id": 1 },
+        "source": { "nodeId": "wellbeing", "id": 3 },
+        "size": 60,
         "display": true,
         "index": 7
-      },
-      {
-        "target": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "source": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "size": 85,
-        "display": true,
-        "index": 8
-      },
-      {
-        "target": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "source": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "size": 8,
-        "display": true,
-        "index": 9
-      },
-      {
-        "target": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "source": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "size": 14,
-        "display": true,
-        "index": 10
-      },
-      {
-        "target": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "source": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "size": 14,
-        "display": true,
-        "index": 11
-      },
-      {
-        "target": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "source": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "size": 90,
-        "display": true,
-        "index": 12
-      },
-      {
-        "target": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "source": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "size": 91,
-        "display": true,
-        "index": 13
-      },
-      {
-        "target": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "source": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "size": 6,
-        "display": true,
-        "index": 14
-      },
-      {
-        "target": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "source": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "size": 8,
-        "display": true,
-        "index": 15
-      },
-      {
-        "target": {
-          "nodeId": "negativeEmotions",
-          "id": 24
-        },
-        "source": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "size": 90,
-        "display": true,
-        "index": 16
-      },
-      {
-        "target": {
-          "nodeId": "workOrStudyProblems",
-          "id": 31
-        },
-        "source": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "size": 89,
-        "display": true,
-        "index": 17
-      },
-      {
-        "target": {
-          "nodeId": "substanceUse",
-          "id": 40
-        },
-        "source": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "size": 8,
-        "display": true,
-        "index": 18
-      },
-      {
-        "target": {
-          "nodeId": "procrastination",
-          "id": 26
-        },
-        "source": {
-          "nodeId": "sleepProblems",
-          "id": 42
-        },
-        "size": 5,
-        "display": true,
-        "index": 19
       }
     ],
-    "linkCount": 20,
+    "linkCount": 8,
     "responseDirection": "outgoing",
     "locale": "en",
     "highlightNode": []
@@ -496,7 +215,7 @@ export default function Hero({ data }: HeroProps) {
             width={600}
             height={600}
           /> */}
-          <TargetNodeIncomingFeedbackDemo data={demoNetwork} targetId={24}/>
+          <TargetNodeIncomingFeedbackDemo data={demoNetwork} targetId={1}/>
         </div>
       </div>
     </section>

@@ -6,6 +6,10 @@
   },
   "options": {},
   "attributes": {
+    "show": {
+      "type": "boolean",
+      "default": true
+    },
     "header": {
       "type": "string"
     },

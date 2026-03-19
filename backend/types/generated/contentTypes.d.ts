@@ -1147,6 +1147,12 @@ export interface ApiNetworkConfigNetworkConfig extends Schema.SingleType {
           localized: true;
         };
       }>;
+    survey: Attribute.Component<'network.survey-config'> &
+      Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

@@ -14,6 +14,7 @@ import useWindowSize from "./hooks/useWindowSize";
 import Feedback from "./Feedback";
 import { OnboardingContextProvider } from "./onboarding/reducer";
 import Intro from "./builder/Intro";
+import SurveyForm from "./builder/SurveyForm";
 import addNodesToLinks from "./utils/readd-nodes";
 const IGNORE_NODES = process.env.NEXT_PUBLIC_IGNORE_NODES === "true"
 
@@ -41,18 +42,19 @@ function deepMerge(target, source) {
 
 
 const formatNodeData = ({node, id}) => {
+  if (!node) return { label: "", name: "", nodeClarification: [], id }
   return (
     {
       ...node,
-      "label": node.label.replaceAll("<br />", " "),
-      "name": node.label,
+      "label": (node.label || "").replaceAll("<br />", " "),
+      "name": node.label || "",
       nodeClarification: [],
       id: id
     }
   )
 }
 
-const NetworkApp = ({ feedback, networkBuilder }) => {
+const NetworkApp = ({ feedback, networkBuilder, survey }) => {
   const [isClient, setIsClient] = useState(false);
   const { width: windowWidth, height: windowHeight } = useWindowSize(isClient);
   const { state, dispatch } = useContext(NetworkContext)
@@ -84,15 +86,19 @@ const NetworkApp = ({ feedback, networkBuilder }) => {
     setIsClient(true);
   }, [])
   const [sliderState, setSlider] = useState(40);
-  const { nodeCount, currentProgress, showNodeClarificationStep, showBuilder } = state
+  const { nodeCount, currentProgress, showNodeClarificationStep, showNodeRankingStep, showBuilder, surveyCompleted } = state
+  const showSurvey = survey?.show && !surveyCompleted && !showBuilder;
+
   if (!isClient) return <Loader />;
   return (
     <div>
       <div className="flex flex-col-reverse sm:flex-row">
-        {showBuilder ? (
+        {showSurvey ? (
+          <SurveyForm config={survey} />
+        ) : showBuilder ? (
           <>
             {
-              isFeedbackStep({ currentProgress, nodeCount, showNodeClarificationStep }) ?
+              isFeedbackStep({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep }) ?
                 (
                   <Feedback data={state} dispatch={dispatch} content={feedback} />
                 ) : (
@@ -138,6 +144,7 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
         nodes: [],
         nodeCount: 0,
         showNodeClarificationStep: false,
+        showNodeRankingStep: config?.networkBuilder?.nodeRankingStep?.show !== false,
         links: [],
         linkCount: 0,
         currentProgress: 0,
@@ -150,7 +157,9 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
         invited,
         pid,
         surveyPid,
-        showBuilder: false
+        showBuilder: false,
+        surveyResponses: null,
+        surveyCompleted: false
       }
 
     } else {
@@ -187,7 +196,7 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
         nodes: d3.shuffle(nodesUpdated),
         nodeCount: nodes.filter(node => node.attributes.required).length,
         showNodeClarificationStep: (config?.networkBuilder?.nodeClarificationStep.show && nodes.filter(node => node.attributes.nodeClarification.length > 0).length > 0) || false,
-        //showNodeClarificationStep: false,
+        showNodeRankingStep: config?.networkBuilder?.nodeRankingStep?.show !== false,
         links: [],
         linkCount: 0,
         currentProgress: 0,
@@ -202,7 +211,9 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
         surveyPid,
         startTimestamp: Date.now(),
         timezoneOffset: new Date().getTimezoneOffset(),
-        showBuilder: false
+        showBuilder: false,
+        surveyResponses: null,
+        surveyCompleted: false
       }
     }
   } else {
@@ -213,14 +224,16 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
   }
 
   // TODO: merge nested
-  const roleCustomization = config.roleCustomization.filter(d => d.customRole.data.attributes.roleId === role)[0]
-  const networkBuilder = deepMerge(config.networkBuilder, roleCustomization?.networkBuilder)
+  const roleCustomization = config?.roleCustomization?.filter(d => d.customRole.data.attributes.roleId === role)?.[0]
+  const networkBuilder = deepMerge(config?.networkBuilder, roleCustomization?.networkBuilder)
   //const networkBuilder = config.networkBuilder
-  const feedback = deepMerge(config.feedback, roleCustomization?.feedback)
+  const feedback = deepMerge(config?.feedback, roleCustomization?.feedback)
   
+  const survey = config?.survey;
+
   return (
     <NetworkContextProvider initialState={initialState}>
-      <NetworkApp networkBuilder={networkBuilder} feedback={feedback} />
+      <NetworkApp networkBuilder={networkBuilder} feedback={feedback} survey={survey} />
     </NetworkContextProvider>
   );
 }

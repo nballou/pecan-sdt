@@ -423,6 +423,7 @@ export interface NetworkBuilderNodeRankingStep extends Schema.Component {
     description: '';
   };
   attributes: {
+    show: Attribute.Boolean & Attribute.DefaultTo<true>;
     header: Attribute.String;
     introduction: Attribute.RichText;
     sliderLabels: Attribute.Component<'elements.problem-ranker-slider-labels'>;
@@ -744,6 +745,43 @@ export interface NetworkRoleCustomization extends Schema.Component {
   };
 }
 
+export interface NetworkSurveyConfig extends Schema.Component {
+  collectionName: 'components_network_survey_configs';
+  info: {
+    displayName: 'Survey Config';
+    icon: 'clipboard';
+    description: '';
+  };
+  attributes: {
+    show: Attribute.Boolean & Attribute.DefaultTo<false>;
+    header: Attribute.String;
+    intro: Attribute.RichText;
+    buttonSubmitLabel: Attribute.String;
+    questions: Attribute.Component<'network.survey-question', true>;
+  };
+}
+
+export interface NetworkSurveyQuestion extends Schema.Component {
+  collectionName: 'components_network_survey_questions';
+  info: {
+    displayName: 'Survey Question';
+    icon: 'question';
+    description: '';
+  };
+  attributes: {
+    questionId: Attribute.String & Attribute.Required;
+    label: Attribute.String & Attribute.Required;
+    fieldType: Attribute.Enumeration<['text', 'number', 'select']> &
+      Attribute.Required;
+    placeholder: Attribute.String;
+    required: Attribute.Boolean & Attribute.DefaultTo<false>;
+    options: Attribute.Text;
+    min: Attribute.Integer;
+    max: Attribute.Integer;
+    helpText: Attribute.String;
+  };
+}
+
 export interface SectionsBottomActions extends Schema.Component {
   collectionName: 'components_slices_bottom_actions';
   info: {
@@ -1037,6 +1075,8 @@ declare module '@strapi/types' {
       'network.node-clarification': NetworkNodeClarification;
       'network.node-overrides': NetworkNodeOverrides;
       'network.role-customization': NetworkRoleCustomization;
+      'network.survey-config': NetworkSurveyConfig;
+      'network.survey-question': NetworkSurveyQuestion;
       'sections.bottom-actions': SectionsBottomActions;
       'sections.feature-columns-group': SectionsFeatureColumnsGroup;
       'sections.feature-rows-group': SectionsFeatureRowsGroup;
