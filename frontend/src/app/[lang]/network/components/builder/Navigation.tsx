@@ -11,8 +11,6 @@ const SubmitButton = ({ dispatch, buttonNextLabel, data, isDisabled }) => {
     const getCurrentDisplayTime = useTrackDisplayTime(`${onboarding ? "onboarding-":""}submitStep`)
 
     const handleClick = async () => {
-        // TODO: 
-        // - handle error or just continue?
         if (NEXT_DEMO_MODE) {
             dispatch({ type: "submit_success", url: null });
         } else {
@@ -92,7 +90,7 @@ const Navigation = ({ data, content, dispatch }) => {
                 >
                     {buttonBackLabel}
                 </Button>
-                {isSubmitStep({ currentProgress, nodeCount, showNodeClarificationStep }) ? (
+                {isSubmitStep({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep: data.showNodeRankingStep }) ? (
                     <SubmitButton
                         buttonNextLabel={buttonNextLabel}
                         dispatch={dispatch}

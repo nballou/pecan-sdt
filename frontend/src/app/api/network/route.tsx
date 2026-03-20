@@ -6,6 +6,7 @@ const CF_ACCESS_CLIENT_SECRET = process.env.CF_ACCESS_CLIENT_SECRET
 export async function POST(req: Request) {
 
     const { networkData, referrer, screen } = await req.json()
+
     const response = await fetch(
         `${process.env.NEXT_INTERNAL_STRAPI_API_URL}/api/networks`,
         {

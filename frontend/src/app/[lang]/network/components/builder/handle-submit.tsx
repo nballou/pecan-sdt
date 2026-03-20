@@ -1,5 +1,4 @@
 const handleSubmit = async (data) => {
-
     const res = await fetch("/api/network", {
         method: "POST",
         headers: {

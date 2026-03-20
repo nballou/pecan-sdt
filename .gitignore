@@ -13,3 +13,6 @@ TODO.md
 
 # Yarn
 .yarn/install-state.gz
+my-data.tar.gz
+.gitignore
+my-local-data.tar.gz
