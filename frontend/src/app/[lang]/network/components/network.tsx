@@ -103,8 +103,8 @@ const NetworkApp = ({ feedback, networkBuilder, survey }) => {
                   feedback?.showDetailedFeedback ?
                     <Feedback data={state} dispatch={dispatch} content={feedback} /> :
                     <div className="flex flex-col items-center justify-center min-h-[50dvh] w-full p-8 text-center">
-                      <h2 className="text-2xl font-bold mb-4">{feedback?.thankYouMessage?.header || "Thank you!"}</h2>
-                      <p className="text-lg text-gray-600">{feedback?.thankYouMessage?.body || "Your response has been recorded."}</p>
+                      <h2 className="text-2xl font-bold mb-4">{feedback?.participantThanks?.header || "Thank you!"}</h2>
+                      <p className="text-lg text-gray-600">{feedback?.participantThanks?.body || "Your response has been recorded."}</p>
                     </div>
                 ) : (
                   <>

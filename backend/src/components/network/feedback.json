@@ -7,6 +7,10 @@
   },
   "options": {},
   "attributes": {
+    "showDetailedFeedback": {
+      "type": "boolean",
+      "default": false
+    },
     "targetNode": {
       "type": "relation",
       "relation": "oneToOne",
