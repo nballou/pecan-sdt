@@ -15,6 +15,7 @@ import Feedback from "./Feedback";
 import { OnboardingContextProvider } from "./onboarding/reducer";
 import Intro from "./builder/Intro";
 import SurveyForm from "./builder/SurveyForm";
+import ConsentStep from "./builder/ConsentStep";
 import addNodesToLinks from "./utils/readd-nodes";
 const IGNORE_NODES = process.env.NEXT_PUBLIC_IGNORE_NODES === "true"
 
@@ -54,7 +55,7 @@ const formatNodeData = ({node, id}) => {
   )
 }
 
-const NetworkApp = ({ feedback, networkBuilder, survey }) => {
+const NetworkApp = ({ feedback, networkBuilder, survey, consent }) => {
   const [isClient, setIsClient] = useState(false);
   const { width: windowWidth, height: windowHeight } = useWindowSize(isClient);
   const { state, dispatch } = useContext(NetworkContext)
@@ -78,22 +79,24 @@ const NetworkApp = ({ feedback, networkBuilder, survey }) => {
   useEffect(() => {
     const sessionState = JSON.parse(sessionStorage.getItem("state"));
     if (sessionState) {
-      dispatch({
-        type: "load_data",
-        data: sessionState
-      })
+      dispatch({ type: "load_data", data: sessionState });
+    } else if (!state.pid) {
+      dispatch({ type: "generate_pid" });
     }
     setIsClient(true);
   }, [])
   const [sliderState, setSlider] = useState(40);
-  const { nodeCount, currentProgress, showNodeClarificationStep, showNodeRankingStep, showBuilder, surveyCompleted } = state
-  const showSurvey = survey?.show && !surveyCompleted && !showBuilder;
+  const { nodeCount, currentProgress, showNodeClarificationStep, showNodeRankingStep, showBuilder, surveyCompleted, consentCompleted } = state
+  const showConsent = consent?.show && !consentCompleted && !showBuilder;
+  const showSurvey = survey?.show && !surveyCompleted && !showBuilder && !showConsent;
 
   if (!isClient) return <Loader />;
   return (
     <div>
       <div className="flex flex-col-reverse sm:flex-row">
-        {showSurvey ? (
+        {showConsent ? (
+          <ConsentStep config={consent} />
+        ) : showSurvey ? (
           <SurveyForm config={survey} />
         ) : showBuilder ? (
           <>
@@ -105,6 +108,13 @@ const NetworkApp = ({ feedback, networkBuilder, survey }) => {
                     <div className="flex flex-col items-center justify-center min-h-[50dvh] w-full p-8 text-center">
                       <h2 className="text-2xl font-bold mb-4">{feedback?.participantThanks?.header || "Thank you!"}</h2>
                       <p className="text-lg text-gray-600">{feedback?.participantThanks?.body || "Your response has been recorded."}</p>
+                      {state.pid && <p className="text-sm text-gray-500 mt-4">Your participant ID: <span className="font-mono font-semibold">{state.pid}</span></p>}
+                      <button
+                        onClick={() => dispatch({ type: "reset_for_new_graph" })}
+                        className="mt-8 px-6 py-3 border border-gray-400 rounded-lg text-gray-600 hover:bg-gray-100"
+                      >
+                        Submit another graph
+                      </button>
                     </div>
                 ) : (
                   <>
@@ -235,10 +245,11 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
   const feedback = deepMerge(config?.feedback, roleCustomization?.feedback)
   
   const survey = config?.survey;
+  const consent = config?.consent;
 
   return (
     <NetworkContextProvider initialState={initialState}>
-      <NetworkApp networkBuilder={networkBuilder} feedback={feedback} survey={survey} />
+      <NetworkApp networkBuilder={networkBuilder} feedback={feedback} survey={survey} consent={consent} />
     </NetworkContextProvider>
   );
 }

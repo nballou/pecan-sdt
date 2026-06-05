@@ -3,7 +3,6 @@ import Image from "next/image";
 import HighlightedText from "./HighlightedText";
 import { getStrapiMedia } from "../utils/api-helpers";
 import { renderButtonStyle } from "../utils/render-button-style";
-import DemoNetwork from "../network/components/feedback/DemoNetwork";
 import { Button } from "@heroui/react";
 import { FaEye } from "react-icons/fa";
 import TargetNodeIncomingFeedbackDemo from "../network/components/feedback/TargetNodeIncomingFeedbackDemo";

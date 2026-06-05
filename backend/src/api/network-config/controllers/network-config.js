@@ -11,26 +11,19 @@ module.exports = createCoreController('api::network-config.network-config', ({ s
     // Get the default response first
     const response = await super.find(ctx);
 
-    // If we have data, manually fetch the survey component
     if (response?.data?.id) {
       const entityId = response.data.id;
 
-      // Query the survey component directly
-      const surveyData = await strapi.db.query('api::network-config.network-config').findOne({
+      const extraData = await strapi.db.query('api::network-config.network-config').findOne({
         where: { id: entityId },
         populate: {
-          survey: {
-            populate: {
-              questions: true
-            }
-          }
+          survey: { populate: { questions: true } },
+          consent: { populate: { statements: true } }
         }
       });
 
-      // Merge survey into the response
-      if (surveyData?.survey) {
-        response.data.attributes.survey = surveyData.survey;
-      }
+      if (extraData?.survey) response.data.attributes.survey = extraData.survey;
+      if (extraData?.consent) response.data.attributes.consent = extraData.consent;
     }
 
     return response;

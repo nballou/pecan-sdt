@@ -58,6 +58,17 @@
         }
       },
       "component": "network.survey-config"
+    },
+    "consent": {
+      "displayName": "Consent",
+      "type": "component",
+      "repeatable": false,
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
+      "component": "network.consent-config"
     }
   }
 }

@@ -38,6 +38,14 @@
     },
     "helpText": {
       "type": "string"
+    },
+    "multiSelect": {
+      "type": "boolean",
+      "default": false
+    },
+    "allowOther": {
+      "type": "boolean",
+      "default": false
     }
   }
 }

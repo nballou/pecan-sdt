@@ -302,6 +302,9 @@ const Feedback = ({ data, dispatch, content }: { data: FeedbackData, dispatch: R
         <h1 className="text-3xl font-bold text-center">
           {introduction.header}
         </h1>
+        {pid && (
+          <p className="text-center text-sm text-gray-500 mt-1 mb-2">Your participant ID: <span className="font-mono font-semibold">{pid}</span></p>
+        )}
         <RichText content={introduction.body} />
         {dyadInvite && (
           <InviteDyad
@@ -403,6 +406,16 @@ const Feedback = ({ data, dispatch, content }: { data: FeedbackData, dispatch: R
         {downloadData?.show && (
           <DownloadData data={data} content={downloadData} />
         )}
+        <div className="print:hidden flex justify-center py-8">
+          <Button
+            onPress={() => dispatch({ type: "reset_for_new_graph" })}
+            color="secondary"
+            variant="bordered"
+            size="lg"
+          >
+            Submit another graph
+          </Button>
+        </div>
       </div>
     </div>
   );

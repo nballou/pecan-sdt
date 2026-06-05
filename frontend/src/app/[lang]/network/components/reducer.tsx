@@ -283,6 +283,44 @@ export function reducer(state, action) {
       saveSession(newState);
       return newState;
     }
+    case 'generate_pid': {
+      const newState = {
+        ...state,
+        pid: Math.random().toString(36).slice(2, 10).toUpperCase()
+      };
+      saveSession(newState);
+      return newState;
+    }
+    case 'set_consent_given': {
+      const newState = { ...state, consentCompleted: true };
+      saveSession(newState);
+      return newState;
+    }
+    case 'reset_for_new_graph': {
+      const resetNodes = state.nodes.map((node: any) => ({
+        ...node,
+        chosen: node.required || false,
+        nodeClarificationSelected: [],
+      }));
+      const newState = {
+        ...state,
+        nodes: resetNodes,
+        nodeCount: resetNodes.filter((n: any) => n.chosen).length,
+        links: [],
+        linkCount: 0,
+        currentProgress: 0,
+        completedSteps: [],
+        surveyCompleted: false,
+        surveyResponses: null,
+        showBuilder: false,
+        highlightNode: [],
+        displayRequirementError: false,
+        url: undefined,
+        // consentCompleted stays true
+      };
+      saveSession(newState);
+      return newState;
+    }
   }
   throw Error('Unknown action: ' + action.type);
 }

@@ -16,6 +16,8 @@ interface SurveyQuestion {
   min?: number;
   max?: number;
   helpText?: string;
+  multiSelect?: boolean;
+  allowOther?: boolean;
 }
 
 interface SurveyConfig {
@@ -26,119 +28,136 @@ interface SurveyConfig {
   questions: SurveyQuestion[];
 }
 
-interface SurveyFormProps {
-  config: SurveyConfig;
-}
+type ResponseValue = string | number | string[];
 
-const SurveyForm = ({ config }: SurveyFormProps) => {
+const SurveyForm = ({ config }: { config: SurveyConfig }) => {
   const { dispatch } = useContext(NetworkContext);
-  const [responses, setResponses] = useState<Record<string, string | number>>({});
+  const [responses, setResponses] = useState<Record<string, ResponseValue>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const parseOptions = (optionsStr?: string): string[] => {
     if (!optionsStr) return [];
-    // Support both newline and comma separators
     const separator = optionsStr.includes("\n") ? "\n" : ",";
-    return optionsStr.split(separator).map((opt) => opt.trim()).filter((opt) => opt !== "");
+    return optionsStr.split(separator).map((o) => o.trim()).filter(Boolean);
   };
 
-  const validateField = (question: SurveyQuestion, value: string | number): string | null => {
-    if (question.required && (value === "" || value === undefined)) {
+  const handleChange = (questionId: string, value: ResponseValue) => {
+    setResponses((prev) => ({ ...prev, [questionId]: value }));
+    if (errors[questionId]) {
+      setErrors((prev) => { const u = { ...prev }; delete u[questionId]; return u; });
+    }
+  };
+
+  const validateField = (q: SurveyQuestion): string | null => {
+    if (!q.required) return null;
+    const value = responses[q.questionId];
+    if (q.fieldType === "select" && q.multiSelect) {
+      if (!Array.isArray(value) || value.length === 0) return "Please select at least one option";
+    } else if (value === "" || value === undefined) {
       return "This field is required";
     }
-
-    if (question.fieldType === "number" && value !== "") {
-      const numValue = Number(value);
-      if (isNaN(numValue)) {
-        return "Please enter a valid number";
-      }
-      if (question.min !== undefined && numValue < question.min) {
-        return `Value must be at least ${question.min}`;
-      }
-      if (question.max !== undefined && numValue > question.max) {
-        return `Value must be at most ${question.max}`;
-      }
+    if (q.fieldType === "number" && value !== "") {
+      const n = Number(value);
+      if (isNaN(n)) return "Please enter a valid number";
+      if (q.min !== undefined && n < q.min) return `Value must be at least ${q.min}`;
+      if (q.max !== undefined && n > q.max) return `Value must be at most ${q.max}`;
     }
-
     return null;
-  };
-
-  const handleChange = (questionId: string, value: string | number) => {
-    setResponses((prev) => ({
-      ...prev,
-      [questionId]: value,
-    }));
-    // Clear error when user modifies field
-    if (errors[questionId]) {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[questionId];
-        return updated;
-      });
-    }
   };
 
   const handleSubmit = () => {
     const newErrors: Record<string, string> = {};
-
-    config.questions.forEach((question) => {
-      const value = responses[question.questionId];
-      const error = validateField(question, value ?? "");
-      if (error) {
-        newErrors[question.questionId] = error;
-      }
+    config.questions.forEach((q) => {
+      const err = validateField(q);
+      if (err) newErrors[q.questionId] = err;
     });
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    // Convert number fields to actual numbers
-    const processedResponses: Record<string, string | number> = {};
-    config.questions.forEach((question) => {
-      const value = responses[question.questionId];
-      if (question.fieldType === "number" && value !== undefined && value !== "") {
-        processedResponses[question.questionId] = Number(value);
+    const processed: Record<string, ResponseValue> = {};
+    config.questions.forEach((q) => {
+      const value = responses[q.questionId];
+      if (q.fieldType === "select") {
+        const otherText = (responses[`${q.questionId}_other`] ?? "") as string;
+        if (q.multiSelect) {
+          const arr = (Array.isArray(value) ? value : []) as string[];
+          processed[q.questionId] = arr.map((v) =>
+            v === "Other" && otherText ? `Other: ${otherText}` : v
+          );
+        } else {
+          processed[q.questionId] =
+            value === "Other" && otherText ? `Other: ${otherText}` : value ?? "";
+        }
+      } else if (q.fieldType === "number" && value !== undefined && value !== "") {
+        processed[q.questionId] = Number(value);
       } else {
-        processedResponses[question.questionId] = value;
+        processed[q.questionId] = value ?? "";
       }
     });
 
-    dispatch({
-      type: "set_survey_responses",
-      responses: processedResponses,
-    });
+    dispatch({ type: "set_survey_responses", responses: processed });
   };
 
-  const renderField = (question: SurveyQuestion) => {
+  const renderField = (q: SurveyQuestion) => {
     const commonProps = {
-      label: question.label,
-      placeholder: question.placeholder || "",
-      isRequired: question.required,
-      isInvalid: !!errors[question.questionId],
-      errorMessage: errors[question.questionId],
-      description: question.helpText,
+      label: q.label,
+      placeholder: q.placeholder || "",
+      isRequired: q.required,
+      isInvalid: !!errors[q.questionId],
+      errorMessage: errors[q.questionId],
+      description: q.helpText,
     };
 
-    switch (question.fieldType) {
+    switch (q.fieldType) {
       case "select": {
-        const options = parseOptions(question.options);
+        const opts = parseOptions(q.options);
+        const allOpts = q.allowOther ? [...opts, "Other"] : opts;
+
+        if (q.multiSelect) {
+          const selected = (responses[q.questionId] as string[]) ?? [];
+          const showOther = q.allowOther && selected.includes("Other");
+          return (
+            <div className="space-y-2">
+              <Select
+                {...commonProps}
+                selectionMode="multiple"
+                selectedKeys={new Set(selected)}
+                onSelectionChange={(keys) => handleChange(q.questionId, Array.from(keys) as string[])}
+              >
+                {allOpts.map((o) => <SelectItem key={o}>{o}</SelectItem>)}
+              </Select>
+              {showOther && (
+                <Input
+                  placeholder="Please specify..."
+                  value={(responses[`${q.questionId}_other`] ?? "") as string}
+                  onValueChange={(v) => handleChange(`${q.questionId}_other`, v)}
+                />
+              )}
+            </div>
+          );
+        }
+
+        const value = (responses[q.questionId] ?? "") as string;
+        const showOther = q.allowOther && value === "Other";
         return (
-          <Select
-            {...commonProps}
-            selectedKeys={responses[question.questionId] ? [String(responses[question.questionId])] : []}
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-              if (selected !== undefined) {
-                handleChange(question.questionId, String(selected));
-              }
-            }}
-          >
-            {options.map((option) => (
-              <SelectItem key={option}>{option}</SelectItem>
-            ))}
-          </Select>
+          <div className="space-y-2">
+            <Select
+              {...commonProps}
+              selectedKeys={value ? [value] : []}
+              onSelectionChange={(keys) => {
+                const sel = Array.from(keys)[0];
+                if (sel !== undefined) handleChange(q.questionId, String(sel));
+              }}
+            >
+              {allOpts.map((o) => <SelectItem key={o}>{o}</SelectItem>)}
+            </Select>
+            {showOther && (
+              <Input
+                placeholder="Please specify..."
+                value={(responses[`${q.questionId}_other`] ?? "") as string}
+                onValueChange={(v) => handleChange(`${q.questionId}_other`, v)}
+              />
+            )}
+          </div>
         );
       }
 
@@ -147,21 +166,20 @@ const SurveyForm = ({ config }: SurveyFormProps) => {
           <Input
             {...commonProps}
             type="number"
-            min={question.min}
-            max={question.max}
-            value={responses[question.questionId]?.toString() ?? ""}
-            onValueChange={(value) => handleChange(question.questionId, value)}
+            min={q.min}
+            max={q.max}
+            value={(responses[q.questionId] ?? "").toString()}
+            onValueChange={(v) => handleChange(q.questionId, v)}
           />
         );
 
-      case "text":
       default:
         return (
           <Input
             {...commonProps}
             type="text"
-            value={responses[question.questionId]?.toString() ?? ""}
-            onValueChange={(value) => handleChange(question.questionId, value)}
+            value={(responses[q.questionId] ?? "").toString()}
+            onValueChange={(v) => handleChange(q.questionId, v)}
           />
         );
     }
@@ -170,17 +188,15 @@ const SurveyForm = ({ config }: SurveyFormProps) => {
   return (
     <div className="flex flex-col w-full min-h-dvh">
       <div className="p-4 flex flex-col flex-grow w-full justify-center items-center">
-        {config.header && (
-          <h2 className="text-2xl font-bold">{config.header}</h2>
-        )}
+        {config.header && <h2 className="text-2xl font-bold">{config.header}</h2>}
         {config.intro && (
           <div className="max-w-lg mx-auto rich-text py-6 prose-lg dark:bg-black dark:text-gray-50">
             <Markdown>{config.intro}</Markdown>
           </div>
         )}
         <div className="w-full max-w-lg space-y-6 py-4">
-          {config.questions.map((question) => (
-            <div key={question.id}>{renderField(question)}</div>
+          {config.questions.map((q) => (
+            <div key={q.id}>{renderField(q)}</div>
           ))}
         </div>
         <Button onPress={handleSubmit} color="primary" size="lg">

@@ -1,19 +1,12 @@
-const path = require("path");
-
-module.exports = ({ env }) => {
-  const DATABASE_FILENAME = path.join(
-    __dirname,
-    "..",
-    env("DATABASE_FILENAME", ".tmp/data.db")
-  );
-  console.log("Database filename: ", env("DATABASE_FILENAME", ".tmp/data.db"));
-  return {
+module.exports = ({ env }) => ({
+  connection: {
+    client: "postgres",
     connection: {
-      client: "sqlite",
-      connection: {
-        filename: DATABASE_FILENAME,
-      },
-      useNullAsDefault: true,
+      host: env("DATABASE_HOST", "localhost"),
+      port: env.int("DATABASE_PORT", 5432),
+      database: env("DATABASE_NAME", "pecan"),
+      user: env("DATABASE_USERNAME", "postgres"),
+      password: env("DATABASE_PASSWORD", "chatwoot"),
     },
-  };
-};
+  },
+});

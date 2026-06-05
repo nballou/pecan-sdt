@@ -676,6 +676,7 @@ export interface NetworkFeedback extends Schema.Component {
     description: '';
   };
   attributes: {
+    showDetailedFeedback: Attribute.Boolean & Attribute.DefaultTo<false>;
     targetNode: Attribute.Relation<
       'network.feedback',
       'oneToOne',

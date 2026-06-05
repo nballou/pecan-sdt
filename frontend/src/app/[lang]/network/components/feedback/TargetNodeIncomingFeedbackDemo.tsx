@@ -7,7 +7,6 @@ import RichText from "./RichText"
 import TargetNode from "./TargetNode"
 import TopThreeSources from "./TopThreeSources"
 import * as d3 from "d3";
-import {Card, CardHeader, CardBody, CardFooter, Divider, Link, Image} from "@heroui/react";
 
 const Viz = ({ data, dispatch, hierarchy = true }) => {
 

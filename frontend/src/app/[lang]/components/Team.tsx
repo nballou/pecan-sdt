@@ -47,11 +47,11 @@ const TeamMember = ({ data }) => {
   return (
     <div className="w-5/12 break-words text-center text-gray-500 md:max-w-[15rem] dark:text-gray-400">
       <div className="relative mx-auto mb-4 h-28 w-28 md:h-36 md:w-36">
-        {picture && (
+        {picture?.data?.attributes?.url && (
           <Image
             fill={true}
             sizes="(max-width: 768px) 33vw, 150px"
-            src={getStrapiMedia(picture?.data?.attributes?.url)}
+            src={getStrapiMedia(picture.data.attributes.url) as string}
             alt={`${name} picture`}
             className={classNames(
               "rounded-full object-cover duration-500 ease-in-out",

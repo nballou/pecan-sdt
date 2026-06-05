@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_network_consent_configs",
+  "info": {
+    "displayName": "Consent Config",
+    "icon": "clipboard-check",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "show": {
+      "type": "boolean",
+      "default": false
+    },
+    "header": {
+      "type": "string"
+    },
+    "body": {
+      "type": "richtext"
+    },
+    "statements": {
+      "displayName": "Statements",
+      "type": "component",
+      "repeatable": true,
+      "component": "network.consent-statement"
+    }
+  }
+}

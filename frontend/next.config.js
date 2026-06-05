@@ -13,6 +13,12 @@ if(NEXT_DEMO_MODE) {
         hostname: 'localhost',
         port: '1337',
         pathname: '/uploads/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'manygraphs-backend',
+        port: '1337',
+        pathname: '/uploads/**',
       }
     ],
   }

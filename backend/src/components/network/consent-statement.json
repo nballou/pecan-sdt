@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_network_consent_statements",
+  "info": {
+    "displayName": "Consent Statement",
+    "icon": "check-square",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text",
+      "required": true
+    },
+    "mandatory": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}
