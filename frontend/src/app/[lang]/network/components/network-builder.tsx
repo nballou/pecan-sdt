@@ -8,6 +8,7 @@ import {
   isNodeRankingStep,
   isLinkRankingIntroStep,
   isLinkRankingStep,
+  isGraphReviewStep,
   isSubmitStep,
 } from "./utils/progress";
 import NodeSelectStep from "./builder/NodeSelectStep";
@@ -15,6 +16,7 @@ import NodeClarificationStep from "./builder/NodeClarificationStep";
 import NodeRankingStep from "./builder/NodeRankingStep";
 import LinkRatingIntroStep from "./builder/LinkRatingIntroStep";
 import LinkRatingStep from "./builder/LinkRatingStep";
+import GraphReviewStep from "./builder/GraphReviewStep";
 import Navigation from "./builder/Navigation";
 
 // Define basic types for props if not already defined elsewhere
@@ -155,6 +157,14 @@ export default function NetworkBuilder({
             linkRankingStep={linkRankingStep}
             scrollIndicator={scrollIndicator} // Pass scrollIndicator
           />
+        )}
+        {isGraphReviewStep({
+          currentProgress,
+          nodeCount,
+          showNodeClarificationStep,
+          showNodeRankingStep,
+        }) && (
+          <GraphReviewStep content={content} />
         )}
         {isSubmitStep({
           currentProgress,

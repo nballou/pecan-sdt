@@ -13,6 +13,7 @@ const networkBuilderPopulate = {
       'nodeSelectStep',
       'nodeRankingtep',
       'linkRatingStepOne',
+      'linkRatingStrengthStep',
       'linkRatingStepTwo',
       'last',
       'demoNodeOne',

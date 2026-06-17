@@ -9,6 +9,9 @@
     "itemHeader": {
       "type": "string"
     },
+    "focusedNodeSuffix": {
+      "type": "string"
+    },
     "sliderLabels": {
       "displayName": "Slider Labels",
       "type": "component",

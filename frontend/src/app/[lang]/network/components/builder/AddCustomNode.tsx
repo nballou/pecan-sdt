@@ -58,6 +58,7 @@ const AddCustomNode = ({ dispatch, content, maxNodes, disabled = false }) => {
                                         type="submit"
                                         fullWidth={true}
                                         isDisabled={value === ""}
+                                        color={value ? "primary" : "default"}
                                     >
                                         {submitButtonLabel}
                                     </Button>

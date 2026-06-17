@@ -17,6 +17,7 @@ const stepKeys = [
   "nodeSelectStep",
   "nodeRankingtep",
   "linkRatingStepOne",
+  "linkRatingStrengthStep",
   "linkRatingStepTwo",
   "last",
 ];
@@ -36,24 +37,26 @@ export default function NetworkOnboarding({
     showSkipButton,
   } = content;
 
+  const linkRatingStepKeys = new Set(["linkRatingStepOne", "linkRatingStrengthStep", "linkRatingStepTwo"]);
+
   const steps = stepKeys.map((key) => {
-    const obj = content[key];
+    const obj = content[key] ?? {};
     if (key == "last") {
       return {
+        target: "body",
         ...obj,
-        content: <LastStep content={obj.content} />,
+        content: obj.content ? <LastStep content={obj.content} /> : <></>,
       };
     } else {
       return {
+        target: key === "linkRatingStrengthStep" ? ".linkRatingStrengthSection" : "body",
+        placement: key === "linkRatingStrengthStep" ? "bottom" : undefined,
         ...obj,
-        content: (
+        content: obj.content ? (
           <ScrollShadow className="max-h-[150px]">
-            <Markdown
-              className="rich-text"
-              children={obj.content}
-            />
+            <Markdown className="rich-text" children={obj.content} />
           </ScrollShadow>
-        ),
+        ) : <></>,
       };
     }
   });
@@ -127,7 +130,33 @@ export default function NetworkOnboarding({
             },
           });
           break;
-        case 4:
+        case 4: {
+          // linkRatingStrengthStep: keep same view but pre-set a direction so
+          // strength buttons are already visible when the step loads
+          const node0 = state.nodes[0];
+          const node1 = state.nodes[1];
+          const hasLink = state.links.some((l: any) => {
+            const srcId = l.source?.id ?? l.source;
+            return srcId == node0?.id;
+          });
+          dispatch({
+            type: "load_data",
+            data: {
+              ...state,
+              links: hasLink
+                ? state.links
+                : [...state.links, { source: node0, target: node1, size: 75, display: true }],
+              linkCount: hasLink ? state.linkCount : (state.linkCount || 0) + 1,
+              currentProgress: 3,
+              onboarding: {
+                ...onboarding,
+                stepIndex: nextStepIndex,
+              },
+            },
+          });
+          break;
+        }
+        case 5:
           dispatch({
             type: "load_data",
             data: {
@@ -141,7 +170,7 @@ export default function NetworkOnboarding({
             },
           });
           break;
-        case 5:
+        case 6:
           dispatch({
             type: "load_data",
             data: {
@@ -155,7 +184,7 @@ export default function NetworkOnboarding({
             },
           });
           break;
-        case 6:
+        case 7:
           globaDispatch({ type: "show_builder" });
           break;
       }

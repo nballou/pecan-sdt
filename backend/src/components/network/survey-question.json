@@ -46,6 +46,11 @@
     "allowOther": {
       "type": "boolean",
       "default": false
+    },
+    "repeatOnGraph": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, this question is shown again when the participant starts a second graph"
     }
   }
 }

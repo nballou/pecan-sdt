@@ -14,6 +14,30 @@
     },
     "maxLabel": {
       "type": "string"
+    },
+    "directionRowLabel": {
+      "type": "string"
+    },
+    "strengthRowLabel": {
+      "type": "string"
+    },
+    "decreasesLabel": {
+      "type": "string"
+    },
+    "noEffectLabel": {
+      "type": "string"
+    },
+    "increasesLabel": {
+      "type": "string"
+    },
+    "weakLabel": {
+      "type": "string"
+    },
+    "moderateLabel": {
+      "type": "string"
+    },
+    "strongLabel": {
+      "type": "string"
     }
   }
 }

@@ -31,6 +31,11 @@
       "repeatable": false,
       "component": "elements.onboarding-step"
     },
+    "linkRatingStrengthStep": {
+      "type": "component",
+      "repeatable": false,
+      "component": "elements.onboarding-step"
+    },
     "linkRatingStepTwo": {
       "type": "component",
       "repeatable": false,

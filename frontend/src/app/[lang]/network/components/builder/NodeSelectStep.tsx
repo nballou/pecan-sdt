@@ -39,7 +39,7 @@ const NodeSelectStep = ({
     <Card className="nodeSelectStep">
       <CardHeader className="flex flex-col gap-0 sm:gap-3 py-1 sm:py-3">
         <h2 className="font-bold text-xl">
-          {header} {`(${nodeCount} / ${maxNodes})`}
+          {header}
         </h2>
         {!onboarding && <Markdown children={introduction} />}
       </CardHeader>

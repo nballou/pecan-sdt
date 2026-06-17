@@ -20,7 +20,9 @@
       "enum": [
         "bottom",
         "center",
-        "left"
+        "left",
+        "right",
+        "top"
       ]
     },
     "target": {
@@ -30,6 +32,7 @@
         ".nodeSelectStep",
         ".nodeRankingStep",
         ".linkRatingStep",
+        ".linkRatingStrengthSection",
         "g#nodes"
       ]
     }

@@ -47,14 +47,19 @@ const isLinkRankingStep = ({ currentProgress, nodeCount, showNodeClarificationSt
     currentProgress <= nodeCount + linkIntroIndex
 }
 
+const isGraphReviewStep = ({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep = true }) => {
+  const linkIntroIndex = getLinkIntroIndex(showNodeClarificationStep, showNodeRankingStep);
+  return currentProgress === nodeCount + linkIntroIndex + 1
+}
+
 const isSubmitStep = ({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep = true }) => {
   const linkIntroIndex = getLinkIntroIndex(showNodeClarificationStep, showNodeRankingStep);
-  return currentProgress == nodeCount + linkIntroIndex + 1
+  return currentProgress === nodeCount + linkIntroIndex + 2
 }
 
 const isFeedbackStep = ({currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep = true }) => {
   const linkIntroIndex = getLinkIntroIndex(showNodeClarificationStep, showNodeRankingStep);
-  return currentProgress > nodeCount + linkIntroIndex + 1
+  return currentProgress > nodeCount + linkIntroIndex + 2
 }
 
 const updateCompletedSteps = ({
@@ -131,6 +136,10 @@ const updateCompletedSteps = ({
       } else completed = true
       break;
     }
+    case isGraphReviewStep({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep }): {
+      completed = true
+      break;
+    }
     case isSubmitStep({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep }): {
       completed = true
       break;
@@ -165,8 +174,10 @@ export {
   isNodeRankingStep,
   isLinkRankingIntroStep,
   isLinkRankingStep,
+  isGraphReviewStep,
   isSubmitStep,
   updateCompletedSteps,
   getLinkProgress,
+  getLinkIntroIndex,
   isFeedbackStep
 }

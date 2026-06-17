@@ -1,10 +1,11 @@
 import { useEffect, useRef, useCallback, useState, useMemo, memo } from "react";
 import { Card, CardHeader, ScrollShadow, Divider } from "@heroui/react";
-import LinkSlider from "./LinkSlider";
+import LinkDirectionPicker from "./LinkDirectionPicker";
 import Markdown from "markdown-to-jsx";
 import { getLinkProgress } from "../utils/progress";
 import useTrackDisplayTime from "../hooks/useTrackDisplayTime";
 import CustomScrollShadow from "./CustomScrollShadow";
+import { CONSTRUCT_COLORS } from "../utils/nodeColors";
 import type { ScrollVisibility } from "@heroui/react";
 
 // Helper function to create a consistent key for the map
@@ -19,6 +20,7 @@ interface LinkRatingItemProps {
   linkRankingStep: any;
   handleLinkSize: (args: any) => void;
   displayRequirementError: any;
+  nodeColor: string;
 }
 
 const LinkRatingItem = memo(
@@ -30,6 +32,7 @@ const LinkRatingItem = memo(
     linkRankingStep,
     handleLinkSize,
     displayRequirementError,
+    nodeColor,
   }: LinkRatingItemProps) => {
     const currentSourceNode =
       responseDirection === "incoming" ? node : focusedNode;
@@ -44,18 +47,17 @@ const LinkRatingItem = memo(
     const currentLinkSize = linkInfo?.size;
 
     return (
-      <LinkSlider
-        key={`${focusedNode.id}-${node.id}`}
+      <LinkDirectionPicker
+        key={`${focusedNode.id}-${node.id}-${currentLinkSize ?? 'null'}`}
         sourceNode={currentSourceNode}
         targetNode={currentTargetNode}
-        linkSize={currentLinkSize}
-        isTouched={isTouched}
+        linkSize={currentLinkSize ?? null}
         linkIndex={linkIndex}
         labels={linkRankingStep?.sliderLabels}
         handleChange={handleLinkSize}
         error={displayRequirementError}
         responseDirection={responseDirection}
-        hideValue={linkRankingStep?.sliderHideValue}
+        nodeColor={nodeColor}
       />
     );
   }
@@ -102,6 +104,15 @@ const LinkRatingStep = ({
 
   const selectedNodes = useMemo(() => nodes.filter((d: any) => d.chosen), [nodes]);
 
+  // Map node id → palette color based on position in full nodes list (consistent with graph)
+  const nodeColorMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    nodes.forEach((node: any, i: number) => {
+      map[node.id] = CONSTRUCT_COLORS[i % CONSTRUCT_COLORS.length]
+    })
+    return map
+  }, [nodes])
+
   const linksLookup = useMemo(() => {
     const map = new Map<string, { index: number; size: any }>();
     links.forEach((link: any, index: number) => {
@@ -134,15 +145,20 @@ const LinkRatingStep = ({
 
   return (
     <Card className="linkRatingStep">
-      <CardHeader className="flex flex-col py-1 sm:py-3">
-        {/* <h2 className="font-bold text-xl">{selectedNodes[linkProgress].questionPrompt}</h2> */}
+      <CardHeader className="flex flex-col items-start py-1 sm:py-3 gap-1">
         {linkRankingStep?.itemHeader && (
-          <Markdown children={linkRankingStep?.itemHeader} />
+          <p className="text-sm text-gray-500 w-full">
+            <Markdown children={linkRankingStep?.itemHeader} />
+          </p>
         )}
-        <h2
-          className="text-xl [&>strong]:text-blue-600"
-          dangerouslySetInnerHTML={{ __html: focusedNode.questionPrompt }}
-        />
+        <h2 className="text-2xl font-bold leading-tight" style={{ color: nodeColorMap[focusedNode.id] }}>
+          {focusedNode.label || focusedNode.name}
+        </h2>
+        {linkRankingStep?.focusedNodeSuffix && (
+          <p className="text-sm text-gray-500">
+            {linkRankingStep.focusedNodeSuffix}
+          </p>
+        )}
       </CardHeader>
       <Divider />
       <CustomScrollShadow
@@ -161,6 +177,7 @@ const LinkRatingStep = ({
               linkRankingStep={linkRankingStep}
               handleLinkSize={handleLinkSize}
               displayRequirementError={displayRequirementError}
+              nodeColor={nodeColorMap[node.id]}
             />
           ))}
       </CustomScrollShadow>

@@ -2,11 +2,14 @@
 import { useState, useEffect, useCallback, useMemo, useReducer, useRef } from "react";
 import useChartDimensions from "./hooks/useChartDimensions";
 import * as d3 from "d3";
+import { CONSTRUCT_COLORS } from "./utils/nodeColors";
 const arrowTypes = [1, 2, 3, 4];
-const linkColor = 'black';
-const therapyNodeColor = '#0070f0';
+const positiveColor = '#16a34a';
+const negativeColor = '#dc2626';
 const highlightNodeColor = "#e74c3c"
 const grayNodecolor = "#C0C0C0"
+const neutralNodeColor = '#334155'
+const hierarchyBlue = '#0070f0'
 
 const drag = (simulation) => {
     function dragstarted(d) {
@@ -41,6 +44,9 @@ function linkArc(d, hierachyFeedback) {
     return `M ${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
 
 }
+
+// Maps any link size to a 0-100 display intensity (symmetric around 50)
+const displaySize = (size) => Math.abs(size - 50) * 2;
 
 const linkStrength = d3
     .scalePow()
@@ -94,16 +100,17 @@ const setLinkOpacity = ({
     noLinkHighlight,
     hierachyFeedback
 }) => {
-
-    if (d.size >= linkFilter) {
-        if (noLinkHighlight || hierachyFeedback) return lineOpacity(d.size)
+    if (d.size === 50) return 0
+    const dSize = displaySize(d.size)
+    if (dSize >= linkFilter) {
+        if (noLinkHighlight || hierachyFeedback) return lineOpacity(dSize)
         if (feedback) {
             const targetId = highlightNode[0]
             const gamingOutgoing = links.filter(d => d.source.id == targetId && d.display).map(d => d.source.id)
 
-            return (highlightNode.length == 0 || highlightNode.includes(responseDirection == "incoming" ? d.source.id : d.target.id) || gamingOutgoing.includes(d.source.id)) ? lineOpacity(d.size) : 0.01
+            return (highlightNode.length == 0 || highlightNode.includes(responseDirection == "incoming" ? d.source.id : d.target.id) || gamingOutgoing.includes(d.source.id)) ? lineOpacity(dSize) : 0.01
         } else {
-            return (highlightNode.length == 0 || highlightNode.includes(responseDirection == "incoming" ? d.target.id : d.source.id)) ? lineOpacity(d.size) : 0.01
+            return (highlightNode.length == 0 || highlightNode.includes(responseDirection == "incoming" ? d.target.id : d.source.id)) ? lineOpacity(dSize) : 0.01
         }
     } else {
         return 0
@@ -116,7 +123,7 @@ const getHierarchFill = ({ cat, direction }) => {
             case "direct":
                 return highlightNodeColor;
             case "indirect":
-                return therapyNodeColor;
+                return hierarchyBlue;
             case "target":
                 return grayNodecolor;
         }
@@ -127,7 +134,7 @@ const getHierarchFill = ({ cat, direction }) => {
             case "indirect":
                 return grayNodecolor;
             case "target":
-                return therapyNodeColor;
+                return hierarchyBlue;
         }
     }
 
@@ -167,6 +174,9 @@ const NetworkViz = ({
     alphaTarget = 0.15
 }
 ) => {
+    const handleClickRef = useRef(handleClick)
+    useEffect(() => { handleClickRef.current = handleClick }, [handleClick])
+
     const [ref, dms] = useChartDimensions({
         marginTop: 10,
         marginBottom: 10,
@@ -186,6 +196,7 @@ const NetworkViz = ({
         responseDirection } = data
     let nodes = [...nodeData.filter(d => d.chosen)]
     let links = [...linkData.filter(d => d.display)];
+
     const markerSize = width > 450 ? 20 : 15;
     const refSvg = useRef()
     const refLink = useRef()
@@ -193,17 +204,15 @@ const NetworkViz = ({
     const lineThickness = useMemo(() =>
         d3
             .scalePow()
-            .domain([
-                0, 100
-            ])
-            .range([1, width < 450 ? 7 : 10])
-            .exponent(3)
+            .domain([0, 100])
+            .range([2, width < 450 ? 7 : 10])
+            .exponent(2)
         ,
         [width])
     const size = useMemo(() => d3
         .scaleLinear()
         .domain([0, 100])
-        .range([Math.sqrt(width) * 0.15, Math.sqrt(width)]),
+        .range([Math.sqrt(width) * 0.5, Math.sqrt(width) * 1.2]),
         [width]
     )
     const simulation = useMemo(() => {
@@ -305,9 +314,9 @@ const NetworkViz = ({
                 noLinkHighlight,
                 hierachyFeedback
             }))
-            .attr('stroke', (d) => linkColor)
-            .style('stroke-width', (d) => lineThickness(d.size))
-            .attr('marker-end', 'url(#arrow-1)')
+            .attr('stroke', (d) => d.size > 50 ? positiveColor : negativeColor)
+            .style('stroke-width', (d) => lineThickness(displaySize(d.size)))
+            .attr('marker-end', (d) => d.size > 50 ? 'url(#arrow-positive)' : 'url(#arrow-negative)')
         function reLinkToEdge(d) {
             // length of current path
             const pathLength = this.getTotalLength();
@@ -330,27 +339,17 @@ const NetworkViz = ({
             .join(enter => {
                 const root = enter.append("g")
                 const circles = root.append("circle")
-                    .attr('fill', (d) => d.highlight ? "red" : therapyNodeColor)
+                    .attr('fill', (d) => d.highlight ? highlightNodeColor : neutralNodeColor)
                     .attr('stroke', 'white')
                     .attr('stroke-width', 1.5)
-                    .attr('r', (d) => size(0))
+                    .attr('r', (d) => size(d.size ?? 50))
                 root.on('click', d => {
                     if (disableClick) return null
-                    if (feedback) {
+                    if (feedback || handleClickRef.current) {
                         const nodeId = nodeData
                             .filter(node => node.name === d.name)
                             .map(d => d.id)
-                        return handleClick(nodeId)
-                    } else {
-                        // TODO: only enable when all respones aren't required?
-                        // const nodeIndex = nodeData
-                        //     .filter(d => d.chosen)
-                        //     .findIndex(node => node.name === d.name)
-                        // const newProgress = nodeIndex + 3
-                        // return dispatch({
-                        //     type: "progress_set",
-                        //     value: newProgress
-                        // })
+                        return handleClickRef.current(nodeId)
                     }
                 })
                 const text = root.append('text')
@@ -360,6 +359,10 @@ const NetworkViz = ({
                     .attr("text-anchor", "right")
                     .attr("dominant-baseline", "middle")
                     .attr("stroke-linejoin", "round")
+                    .attr('fill', (d) => {
+                        const idx = nodeData.findIndex(n => n.id == d.id)
+                        return CONSTRUCT_COLORS[Math.max(0, idx) % CONSTRUCT_COLORS.length]
+                    })
 
                 const tSpan = text.selectAll("tspan")
                     .data(d => d.name.split("<br />"))
@@ -441,16 +444,16 @@ const NetworkViz = ({
             .selectAll('circle')
             .data(nodes, d => d.id)
             .attr('r', (d) => {
-                return size(d.size)
+                return size(d.size ?? 50)
             })
             .attr('fill', (d) => {
                 if (hierachyFeedback) return getHierarchFill({ cat: d.xPosCat, direction: hierachyFeedback })
                 const sources = links
                     .filter(link => highlightNode.includes(responseDirection == "incoming" ? link.target.id : link.source.id))
                     .map(node => responseDirection == "incoming" ? node.source.id : node.target.id)
-                if (highlightNode.length === 0) return therapyNodeColor
+                if (highlightNode.length === 0) return neutralNodeColor
                 if (highlightNode.includes(d.id)) return highlightNodeColor
-                if (sources.includes(d.id)) return therapyNodeColor; else return grayNodecolor;
+                if (sources.includes(d.id)) return neutralNodeColor; else return grayNodecolor;
             })
 
     }, [nodeData, width])
@@ -473,9 +476,9 @@ const NetworkViz = ({
                 const sources = links
                     .filter(link => highlightNode.includes(responseDirection == "incoming" ? link.target.id : link.source.id))
                     .map(node => responseDirection == "incoming" ? node.source.id : node.target.id)
-                if (highlightNode.length === 0) return therapyNodeColor
+                if (highlightNode.length === 0) return neutralNodeColor
                 if (highlightNode.includes(d.id)) return highlightNodeColor
-                if (sources.includes(d.id)) return therapyNodeColor; else return grayNodecolor;
+                if (sources.includes(d.id)) return neutralNodeColor; else return grayNodecolor;
             })
 
         link
@@ -517,9 +520,9 @@ const NetworkViz = ({
                     )
                     .map(node => responseDirection == "incoming" ? node.source.id : node.target.id)
 
-                if (highlightNode.length === 0) return therapyNodeColor
+                if (highlightNode.length === 0) return neutralNodeColor
                 if (highlightNode.includes(d.id)) return highlightNodeColor
-                if (sources.includes(d.id)) return therapyNodeColor; else return grayNodecolor;
+                if (sources.includes(d.id)) return neutralNodeColor; else return grayNodecolor;
             })
             .attr('opacity', (d) => {
                 //if (feedback) return nodeOpacity(d.size)
@@ -549,10 +552,9 @@ const NetworkViz = ({
                 links,
                 hierachyFeedback
             }))
-            .style('stroke-width', (d) => {
-                const value = lineThickness(d.size)
-                return value
-            })
+            .attr('stroke', (d) => d.size > 50 ? positiveColor : negativeColor)
+            .attr('marker-end', (d) => d.size > 50 ? 'url(#arrow-positive)' : 'url(#arrow-negative)')
+            .style('stroke-width', (d) => lineThickness(displaySize(d.size)))
         simulation
             .force('link')
             .links(links)
@@ -575,7 +577,7 @@ const NetworkViz = ({
                 links,
                 hierachyFeedback
             }))
-            .style('stroke-width', (d) => lineThickness(d.size))
+            .style('stroke-width', (d) => lineThickness(displaySize(d.size)))
     }, [linkFilter])
 
     return (
@@ -595,24 +597,27 @@ const NetworkViz = ({
                 viewBox={`${-width / 2},${-height / 2},${width},${height}`}
             >
                 <defs>
-                    {arrowTypes.map((d, id) => {
-                        return (
-                            <marker
-                                key={id}
-                                id={`arrow-${d}`}
-                                viewBox="0 0 10 10"
-                                refX="0"
-                                refY="5"
-                                markerUnits="userSpaceOnUse"
-                                markerWidth={markerSize}
-                                markerHeight={markerSize}
-                                orient="auto"
-                            >
-                                <path fill={color(d)} d="M 0 0 L 10 5 L 0 10 z" />
-                            </marker>
-                        )
-                    })}
-
+                    {arrowTypes.map((d, id) => (
+                        <marker
+                            key={id}
+                            id={`arrow-${d}`}
+                            viewBox="0 0 10 10"
+                            refX="0"
+                            refY="5"
+                            markerUnits="userSpaceOnUse"
+                            markerWidth={markerSize}
+                            markerHeight={markerSize}
+                            orient="auto"
+                        >
+                            <path fill={color(d)} d="M 0 0 L 10 5 L 0 10 z" />
+                        </marker>
+                    ))}
+                    <marker id="arrow-positive" viewBox="0 0 10 10" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth={markerSize} markerHeight={markerSize} orient="auto">
+                        <path fill={positiveColor} d="M 0 0 L 10 5 L 0 10 z" />
+                    </marker>
+                    <marker id="arrow-negative" viewBox="0 0 10 10" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth={markerSize} markerHeight={markerSize} orient="auto">
+                        <path fill={negativeColor} d="M 0 0 L 10 5 L 0 10 z" />
+                    </marker>
                 </defs>
                 <g ref={refLink} fill="none" />
                 <g ref={refNode} id="nodes" fill='currentColor' />

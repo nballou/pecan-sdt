@@ -2,7 +2,7 @@ const NEXT_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE
 import { useState } from "react";
 import { Pagination, Button } from "@heroui/react";
 import handleSubmit from "./handle-submit";
-import { isSubmitStep } from "../utils/progress";
+import { isSubmitStep, isGraphReviewStep } from "../utils/progress";
 import useTrackDisplayTime from "../hooks/useTrackDisplayTime";
 
 const SubmitButton = ({ dispatch, buttonNextLabel, data, isDisabled }) => {
@@ -114,7 +114,7 @@ const Navigation = ({ data, content, dispatch }) => {
             </div>
             <div className="hidden sm:mt-2 sm:flex flex-row justify-center">
                 <Pagination
-                    total={nodeCount + (showNodeClarificationStep ? 5 : 4)}
+                    total={nodeCount + (showNodeClarificationStep ? 6 : 5)}
                     color="primary"
                     page={currentProgress + 1}
                     onChange={value => dispatch({

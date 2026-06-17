@@ -18,6 +18,7 @@ interface SurveyQuestion {
   helpText?: string;
   multiSelect?: boolean;
   allowOther?: boolean;
+  repeatOnGraph?: boolean;
 }
 
 interface SurveyConfig {
@@ -190,11 +191,11 @@ const SurveyForm = ({ config }: { config: SurveyConfig }) => {
       <div className="p-4 flex flex-col flex-grow w-full justify-center items-center">
         {config.header && <h2 className="text-2xl font-bold">{config.header}</h2>}
         {config.intro && (
-          <div className="max-w-lg mx-auto rich-text py-6 prose-lg dark:bg-black dark:text-gray-50">
+          <div className="max-w-2xl mx-auto rich-text py-6 prose-lg dark:bg-black dark:text-gray-50">
             <Markdown>{config.intro}</Markdown>
           </div>
         )}
-        <div className="w-full max-w-lg space-y-6 py-4">
+        <div className="w-full max-w-2xl space-y-6 py-4">
           {config.questions.map((q) => (
             <div key={q.id}>{renderField(q)}</div>
           ))}

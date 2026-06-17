@@ -7,7 +7,7 @@ import NetworkBuilder from "./network-builder";
 import NetworkViz from "./network-viz";
 import * as d3 from "d3";
 
-import { isFeedbackStep } from "./utils/progress"
+import { isFeedbackStep, isGraphReviewStep, getLinkIntroIndex } from "./utils/progress"
 import { useSearchParams } from 'next/navigation'
 
 import useWindowSize from "./hooks/useWindowSize";
@@ -86,9 +86,24 @@ const NetworkApp = ({ feedback, networkBuilder, survey, consent }) => {
     setIsClient(true);
   }, [])
   const [sliderState, setSlider] = useState(40);
-  const { nodeCount, currentProgress, showNodeClarificationStep, showNodeRankingStep, showBuilder, surveyCompleted, consentCompleted } = state
+  const { nodeCount, currentProgress, showNodeClarificationStep, showNodeRankingStep, showBuilder, surveyCompleted, consentCompleted, repeatSurveyAnswered } = state
   const showConsent = consent?.show && !consentCompleted && !showBuilder;
+  const repeatQuestions = (survey?.questions ?? []).filter((q: any) => q.repeatOnGraph)
+  const needsRepeatSurvey = survey?.show && surveyCompleted && repeatQuestions.length > 0 && !repeatSurveyAnswered && !showBuilder && !showConsent
   const showSurvey = survey?.show && !surveyCompleted && !showBuilder && !showConsent;
+  const surveyConfigToShow = needsRepeatSurvey ? { ...survey, questions: repeatQuestions } : survey
+
+  const onReviewStep = isGraphReviewStep({ currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep })
+
+  const handleReviewNodeClick = (nodeIds: string[]) => {
+    const nodeId = nodeIds[0]
+    const chosenNodes = state.nodes.filter((d: any) => d.chosen)
+    const nodeIndex = chosenNodes.findIndex((n: any) => n.id == nodeId)
+    if (nodeIndex >= 0) {
+      const stepIndex = getLinkIntroIndex(showNodeClarificationStep, showNodeRankingStep) + 1 + nodeIndex
+      dispatch({ type: 'jump_to_edit_from_review', stepIndex, nodeId })
+    }
+  }
 
   if (!isClient) return <Loader />;
   return (
@@ -96,8 +111,8 @@ const NetworkApp = ({ feedback, networkBuilder, survey, consent }) => {
       <div className="flex flex-col-reverse sm:flex-row">
         {showConsent ? (
           <ConsentStep config={consent} />
-        ) : showSurvey ? (
-          <SurveyForm config={survey} />
+        ) : (showSurvey || needsRepeatSurvey) ? (
+          <SurveyForm config={surveyConfigToShow} />
         ) : showBuilder ? (
           <>
             {
@@ -119,13 +134,15 @@ const NetworkApp = ({ feedback, networkBuilder, survey, consent }) => {
                 ) : (
                   <>
                     <NetworkBuilder content={networkBuilder} state={state} dispatch={dispatch} />
-                    <div className="flex-grow h-[calc(40dvh)] sm:h-[calc(100dvh)]" id="visualization">
+                    <div className={`flex-grow h-[calc(40dvh)] sm:h-[calc(100dvh)] ${onReviewStep ? 'cursor-pointer' : ''}`} id="visualization">
                       <NetworkViz
                         dispatch={dispatch}
                         data={state}
                         sliderState={sliderState}
                         distance={0}
                         fixedWidth={windowWidth > 640 ? windowWidth - 400 : windowWidth}
+                        handleClick={onReviewStep ? handleReviewNodeClick : undefined}
+                        noLinkHighlight={onReviewStep}
                       />
                     </div>
                   </>
@@ -174,7 +191,9 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
         surveyPid,
         showBuilder: false,
         surveyResponses: null,
-        surveyCompleted: false
+        surveyCompleted: false,
+        repeatSurveyAnswered: false,
+        editFromReview: false,
       }
 
     } else {
@@ -228,7 +247,9 @@ export default function Network({ nodes, savedNetwork, lang, config, }) {
         timezoneOffset: new Date().getTimezoneOffset(),
         showBuilder: false,
         surveyResponses: null,
-        surveyCompleted: false
+        surveyCompleted: false,
+        repeatSurveyAnswered: false,
+        editFromReview: false,
       }
     }
   } else {

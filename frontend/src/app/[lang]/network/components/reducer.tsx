@@ -1,6 +1,6 @@
 import React, { createContext, useReducer } from 'react';
 
-import { updateCompletedSteps, isLinkRankingStep, getLinkProgress } from "./utils/progress"
+import { updateCompletedSteps, isLinkRankingStep, getLinkProgress, getLinkIntroIndex } from "./utils/progress"
 import saveSession from "./utils/save-session"
 const NEXT_DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE
 
@@ -197,20 +197,26 @@ export function reducer(state, action) {
         errorMessages: action.errorMessages
       })
       if (completedSteps[currentProgress]?.completed) {
+        let newProgress = state.currentProgress + 1
+        let newEditFromReview = state.editFromReview
 
-        const newProgress = state.currentProgress + 1
+        // When editing from review, jump back to the review step after saving
+        if (state.editFromReview && isLinkRankingStep({currentProgress, nodeCount, showNodeClarificationStep, showNodeRankingStep})) {
+          newProgress = nodeCount + getLinkIntroIndex(showNodeClarificationStep, showNodeRankingStep) + 1
+          newEditFromReview = false
+        }
+
         let highlightNode = []
         if (isLinkRankingStep({currentProgress: newProgress, nodeCount: state.nodeCount, showNodeClarificationStep, showNodeRankingStep})) {
           highlightNode = [state.nodes.filter(d => d.chosen)[getLinkProgress({currentProgress: newProgress, showNodeClarificationStep, showNodeRankingStep})].id]
         }
         const newState = {
           ...state,
-          // TODO: if the node is updated the previous links break
           highlightNode,
           completedSteps,
           currentProgress: newProgress,
+          editFromReview: newEditFromReview,
           displayRequirementError: false
-
         }
         saveSession(newState)
         return newState
@@ -277,8 +283,10 @@ export function reducer(state, action) {
     case 'set_survey_responses': {
       const newState = {
         ...state,
-        surveyResponses: action.responses,
+        // Merge so repeat-survey answers layer on top of prior answers
+        surveyResponses: { ...(state.surveyResponses || {}), ...action.responses },
         surveyCompleted: true,
+        repeatSurveyAnswered: true,
       };
       saveSession(newState);
       return newState;
@@ -296,6 +304,16 @@ export function reducer(state, action) {
       saveSession(newState);
       return newState;
     }
+    case 'jump_to_edit_from_review': {
+      const newState = {
+        ...state,
+        currentProgress: action.stepIndex,
+        editFromReview: true,
+        highlightNode: [action.nodeId],
+      }
+      saveSession(newState)
+      return newState
+    }
     case 'reset_for_new_graph': {
       const resetNodes = state.nodes.map((node: any) => ({
         ...node,
@@ -310,13 +328,13 @@ export function reducer(state, action) {
         linkCount: 0,
         currentProgress: 0,
         completedSteps: [],
-        surveyCompleted: false,
-        surveyResponses: null,
         showBuilder: false,
         highlightNode: [],
         displayRequirementError: false,
+        editFromReview: false,
+        repeatSurveyAnswered: false,
         url: undefined,
-        // consentCompleted stays true
+        // consentCompleted and surveyCompleted stay true
       };
       saveSession(newState);
       return newState;
